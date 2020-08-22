@@ -1,0 +1,8 @@
+//
+// Created by berger on 22/08/20.
+//
+
+#ifndef COMPILADORES20201_HASH_H
+#define COMPILADORES20201_HASH_H
+
+#endif //COMPILADORES20201_HASH_H
