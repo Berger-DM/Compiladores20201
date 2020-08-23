@@ -5,6 +5,8 @@
     int lineNumber = 1;
 %}
 
+%x COMMENT
+
 %%
 "char"                  return KW_CHAR;
 "int"                   return KW_INT;
@@ -22,32 +24,32 @@
 ">="                    return OPERATOR_GE;
 "=="                    return OPERATOR_EQ;
 "!="                    return OPERATOR_DIF;
-[_@a-zAz][_@0-9a-zA-z]* return TK_IDENTIFIER;
-[0-9][0-9A-F]*      return LIT_INTEGER;
+[a-zAz_@][0-9a-zA-z_@]* return TK_IDENTIFIER;
+[0-9][0-9A-F]*      	return LIT_INTEGER;
 [0-9A-F]*.[0-9A-F]+     return LIT_FLOAT;
 "TRUE"                  return LIT_TRUE;
 "FALSE"                 return LIT_FALSE;
 "\'"[a-zA-Z]"\'"        return LIT_CHAR;
-"\""                    BEGIN(STRING);
-"//".*
-"/*"                    BEGIN(COMMENT);
-[ \t]
+"//".*			
+[ \t]			
 [,;:(){}[]+-=/<>|^~&$#] return yytext[0];
 "\n"                    ++lineNumber;
 
-<STRING>
-<STRING>"\n"            ++lineNumber;
-<STRING>"\""            BEGIN(INITIAL);
+"\"([^\"\\\n]|\\.)*\""  return LIT_STRING;
 
-<COMMENT>.
+"/*"                    BEGIN(COMMENT);
 <COMMENT>"\n"           ++lineNumber;
 <COMMENT>"*/"           BEGIN(INITIAL);
+<COMMENT>.
 %%
 
 //#include "main.c"
 
-void InitMe(void);
-// Implementar
+void initMe(void)
+{
+    lineNumber = 1;
+    hashInit();
+}
 
 int getLineNumber(void)
 {
@@ -57,4 +59,10 @@ int getLineNumber(void)
 int isRunning(void)
 {
     return Running;
+}
+
+int yywrap()
+{
+	Running = 0;
+	return 1;
 }

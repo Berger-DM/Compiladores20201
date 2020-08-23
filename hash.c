@@ -17,11 +17,11 @@ int hashAddress(char *text)
     int address = 1;
     int loopint;
     for (loopint=0; loopint<strlen(text); loopint++)
-        address = (address * text[i]) % HASH_SIZE + 1;
+        address = (address * text[loopint]) % HASH_SIZE + 1;
     return address - 1;
 }
 
-HASH_NODE hashFind(char *text)
+HASH_NODE* hashFind(char *text)
 {
     HASH_NODE *node;
     int address = hashAddress(text);
@@ -33,7 +33,7 @@ HASH_NODE hashFind(char *text)
     return 0;
 }
 
-HASH_NODE hashInsert(char *text)
+HASH_NODE* hashInsert(char *text)
 {
     HASH_NODE *newhashnode;
     int address = hashAddress(text);
@@ -51,6 +51,6 @@ void hashPrint(void)
     int loopint;
     HASH_NODE *node;
     for (loopint=0; loopint<HASH_SIZE; loopint++)
-        for (node=Table[i]; node; node = node->next)
-            printf("Table[%d] has %s\n", i, node->text);
+        for (node=Table[loopint]; node; node = node->next)
+            printf("Table[%d] has %s\n", loopint, node->text);
 }
