@@ -1,8 +1,16 @@
-//
-// Created by berger on 22/08/20.
-//
+#include <stdio.h>
 
-#ifndef COMPILADORES20201_HASH_H
-#define COMPILADORES20201_HASH_H
+#define HASH_SIZE 997
 
-#endif //COMPILADORES20201_HASH_H
+typedef struct hash_node
+{
+    int type;
+    char *text;
+    struct hash_node * next;
+}HASH_NODE;
+
+void hashInit(void);
+int hashAddress(char *text);
+HASH_NODE *hashFind(char *text);
+HASH_NODE *hashInsert(char *text);
+void hashPrint(void);

@@ -1,5 +1,6 @@
 %{
     #include "tokens.h"
+    #include "hash.h"
     int Running = 1;
     int lineNumber = 1;
 %}
@@ -22,7 +23,7 @@
 "=="                    return OPERATOR_EQ;
 "!="                    return OPERATOR_DIF;
 [_@a-zAz][_@0-9a-zA-z]* return TK_IDENTIFIER;
-0[1-9A-F][0-9A-F]*      return LIT_INTEGER;
+[0-9][0-9A-F]*      return LIT_INTEGER;
 [0-9A-F]*.[0-9A-F]+     return LIT_FLOAT;
 "TRUE"                  return LIT_TRUE;
 "FALSE"                 return LIT_FALSE;
