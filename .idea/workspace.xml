@@ -9,12 +9,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2b596d53-f731-4a8f-9754-1dd6a4aca2ef" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hash.c" beforeDir="false" afterPath="$PROJECT_DIR$/hash.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hash.h" beforeDir="false" afterPath="$PROJECT_DIR$/hash.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scanner.l" beforeDir="false" afterPath="$PROJECT_DIR$/scanner.l" afterDir="false" />
-    </list>
+    <list default="true" id="2b596d53-f731-4a8f-9754-1dd6a4aca2ef" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,7 +20,7 @@
     <session id="1719225066">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="4" />
+          <entry key="project.closed" value="5" />
           <entry key="project.open.time.13" value="1" />
           <entry key="project.open.time.29" value="1" />
           <entry key="project.open.time.3" value="1" />
@@ -212,7 +207,7 @@
       <workItem from="1598104719428" duration="6962000" />
       <workItem from="1598192639146" duration="3207000" />
       <workItem from="1598204407646" duration="51000" />
-      <workItem from="1598207265732" duration="5932000" />
+      <workItem from="1598207265732" duration="6532000" />
     </task>
     <task id="LOCAL-00001" summary="initial attempt on regular expressions for tokens">
       <created>1598112893670</created>
@@ -225,7 +220,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="16465000" />
+    <option name="totallyTimeSpent" value="17065000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="27" width="1299" height="741" extended-state="6" />

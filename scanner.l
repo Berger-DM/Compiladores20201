@@ -24,18 +24,19 @@
 ">="                    return OPERATOR_GE;
 "=="                    return OPERATOR_EQ;
 "!="                    return OPERATOR_DIF;
-[a-zAz_@][0-9a-zA-z_@]* return TK_IDENTIFIER;
-[0-9][0-9A-F]*      	return LIT_INTEGER;
-[0-9A-F]*.[0-9A-F]+     return LIT_FLOAT;
-"TRUE"                  return LIT_TRUE;
-"FALSE"                 return LIT_FALSE;
-"\'"[a-zA-Z]"\'"        return LIT_CHAR;
+[a-zAz_@][0-9a-zA-z_@]* {hashInsert(yytext); return TK_IDENTIFIER;}
+[0-9][0-9A-F]*      	{hashInsert(yytext); return LIT_INTEGER;}
+[0-9A-F]*\.[0-9A-F]+     {hashInsert(yytext); return LIT_FLOAT;}
+"TRUE"                  {hashInsert(yytext); return LIT_TRUE;}
+"FALSE"                 {hashInsert(yytext); return LIT_FALSE;}
+"\'"[a-zA-Z]"\'"        {hashInsert(yytext); return LIT_CHAR;}
 "//".*			
 [ \t]			
 [,;:(){}[]+-=/<>|^~&$#] return yytext[0];
 "\n"                    ++lineNumber;
+.						return TOKEN_ERROR;
 
-"\"([^\"\\\n]|\\.)*\""  return LIT_STRING;
+\"([^\"\\\n]|\\.)*\"  {hashInsert(yytext); return LIT_STRING;}
 
 "/*"                    BEGIN(COMMENT);
 <COMMENT>"\n"           ++lineNumber;
@@ -64,5 +65,6 @@ int isRunning(void)
 int yywrap()
 {
 	Running = 0;
+	fprintf(stderr, "Line count: %d", lineNumber);
 	return 1;
 }
