@@ -1,3 +1,4 @@
+//Autor: Nicolas Mauro de Moreira Bohnenberger - 00207160
 #include "hash.h"
 #include <stdio.h>
 #include <string.h>
