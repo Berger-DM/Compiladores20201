@@ -1,3 +1,4 @@
+//Autor: Nicolas Mauro de Moreira Bohnenberger - 00207160
 #include <stdio.h>
 
 #define HASH_SIZE 997

@@ -1,4 +1,5 @@
 %{
+    //Autor: Nicolas Mauro de Moreira Bohnenberger - 00207160
     #include "tokens.h"
     #include "hash.h"
     int Running = 1;
