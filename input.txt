@@ -1,5 +1,5 @@
 int x = 19A9;
-float beta = 0A.F;
+float beta = .F;
 // teste comentário simples
 "antananarivo"
 /* teste
@@ -10,4 +10,4 @@ linhas */
 'z'
 
 	
-_alfa
+_@alfa

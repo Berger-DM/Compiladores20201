@@ -58,6 +58,7 @@ int main(int argc, char ** argv)
 			case LIT_FALSE:		printf("Achei um FALSE na linha %d\n", getLineNumber()); break;
 			case LIT_CHAR:		printf("Achei o char %s na linha %d\n", yytext, getLineNumber()); break;
 			case LIT_STRING:	printf("Achei a string %s na linha %d\n", yytext, getLineNumber()); break;
+			case TOKEN_ERROR:	printf("Erro de Token: %s na linha %d\n", yytext, getLineNumber()); break;
 			default:		printf("Encontrei o caractere especial %s na linha %d\n", yytext, getLineNumber()); break;
         }
     }
