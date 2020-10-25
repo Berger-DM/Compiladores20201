@@ -1,0 +1,13 @@
+int x = 19A9;
+float beta = .F;
+// teste comentário simples
+"antananarivo"
+/* teste
+de
+comentário
+multiplas
+linhas */
+'z'
+
+	
+_@alfa

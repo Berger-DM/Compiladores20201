@@ -1,6 +1,6 @@
 %{
     //Autor: Nicolas Mauro de Moreira Bohnenberger - 00207160
-    #include "tokens.h"
+    #include "y.tab.h"
     #include "hash.h"
     int Running = 1;
     int lineNumber = 1;
@@ -9,6 +9,8 @@
 %x COMMENT
 
 %%
+"TRUE"                  	                        {hashInsert(SYMBOL_LIT_TRU, yytext); return LIT_TRUE;}
+"FALSE"                 	                        {hashInsert(SYMBOL_LIT_FLS, yytext); return LIT_FALSE;}
 "char"                  	                        return KW_CHAR;
 "int"                   	                        return KW_INT;
 "float"                 	                        return KW_FLOAT;
@@ -25,19 +27,18 @@
 ">="                    	                        return OPERATOR_GE;
 "=="                    	                        return OPERATOR_EQ;
 "!="                    	                        return OPERATOR_DIF;
-[a-zAz_@][0-9a-zA-z_@]*		                        {hashInsert(yytext); return TK_IDENTIFIER;}
-[0-9][0-9A-F]*		 		                        {hashInsert(yytext); return LIT_INTEGER;}
-[0-9A-F]*\.[0-9A-F]+    	                        {hashInsert(yytext); return LIT_FLOAT;}
-"TRUE"                  	                        {hashInsert(yytext); return LIT_TRUE;}
-"FALSE"                 	                        {hashInsert(yytext); return LIT_FALSE;}
-"\'"[a-zA-Z]"\'"        	                        {hashInsert(yytext); return LIT_CHAR;}
+[0-9][0-9A-F]*		 		                        {hashInsert(SYMBOL_LIT_INT, yytext); return LIT_INTEGER;}
+[0-9A-F]*\.[0-9A-F]+    	                        {hashInsert(SYMBOL_LIT_FLT, yytext); return LIT_FLOAT;}
+
+"\'"[a-zA-Z]"\'"        	                        {hashInsert(SYMBOL_LIT_CHR, yytext); return LIT_CHAR;}
+[a-zAz_@]+[0-9a-zA-z_@]*		                    {hashInsert(SYMBOL_TOK_IDT, yytext); return TK_IDENTIFIER;}
 "//".*			
 [ \t]			
 [\,\;\:\(\)\[\]\{\}\+\-\*\/\<\>\=\|\^\~\&\$\#]  	return yytext[0];
 "\n"                                            	++lineNumber;
 .			 				                        return TOKEN_ERROR;
 
-\"([^"\\\n]|\\.)*\"                      	 	    {hashInsert(yytext); return LIT_STRING;}
+\"([^\"\\\n]|\\.)*\"                      	 	    {hashInsert(SYMBOL_LIT_STR, yytext); return LIT_STRING;}
 
 "/*"                                        	    BEGIN(COMMENT);
 <COMMENT>"\n"                               	    ++lineNumber;
@@ -45,7 +46,9 @@
 <COMMENT>.
 %%
 
-//#include "main.c"
+// #include "y.tab.c"
+// #include "main.c"
+// #include "hash.c"
 
 void initMe(void)
 {
