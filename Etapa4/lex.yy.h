@@ -1,6 +1,7 @@
 #include "ast.h"
 #include "hash.h"
 #include "y.tab.h"
+#include "semantic.h"
 
 #define FALSE 0
 #define TRUE 1

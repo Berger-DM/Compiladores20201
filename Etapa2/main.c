@@ -1,7 +1,7 @@
 //Autor: Nicolas Mauro de Moreira Bohnenberger - 00207160
 #include <stdio.h>
 #include <stdlib.h>
-#include "y.tab.h"
+#include "lex.yy.h"
 
 int yylex(void);
 void initMe(void);
@@ -12,8 +12,10 @@ void hashPrint(void);
 extern char *yytext;
 extern FILE *yyin;
 
-int main(int argc, char ** argv)
+void main(int argc, char ** argv)
 {
+    initMe();
+
     if (argc<2)
     {
         fprintf(stderr, "Call: etapa2 fileName\n");
@@ -27,9 +29,6 @@ int main(int argc, char ** argv)
         exit(2);
     }
 
-    initMe();
-
-	int tok;
 	yyparse();
 	hashPrint();
 	

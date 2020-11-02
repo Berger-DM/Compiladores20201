@@ -16,14 +16,14 @@ main.o: main.c
 hash.o: hash.c
 	gcc -c hash.c
 
-lex.yy.o: lex.yy.c
+lex.yy.o: lex.yy.c y.tab.o
 	gcc -c lex.yy.c
 
 y.tab.o: y.tab.c
 	gcc -c y.tab.c
 
-lex.yy.c: y.tab.c scanner.l
-	lex scanner.l
+lex.yy.c: scanner.l
+	flex scanner.l
 
 y.tab.c: parser.y
 	yacc -d parser.y

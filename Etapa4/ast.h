@@ -44,7 +44,11 @@ enum
     AST_IF,
     AST_IF_ELSE,
     AST_WHILE,
-    AST_LOOP
+    AST_LOOP,
+    AST_TYPECHAR,
+    AST_TYPEINT,
+    AST_TYPEFLOAT,
+    AST_TYPEBOOL,
 };
 
 typedef struct ast_node

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "lex.yy.h"
+#include "semantic.h"
 
 // Fornecido pelo lexer em lex.yy.c
 extern char *yytext;
@@ -11,6 +12,9 @@ extern int yylex();
 // Fornecido pelo parser y.tab.c
 extern int yyparse();
 extern AST *ASTroot;
+
+extern int SemanticErrors;
+void checkAndSetDeclarations(AST* node);
 
 void main(const int argc, const char **argv)
 {
@@ -38,8 +42,10 @@ void main(const int argc, const char **argv)
     }
 
     yyparse();
-    decompile(ASTroot, outfile);
-    fprintf(stdout, "Succesful Compilation!\n");
-
+    //decompile(ASTroot, outfile);
+    //fprintf(stdout, "Succesful Compilation!\n");
+    checkAndSetDeclarations(ASTroot);
+    int result = SemanticErrors;
+    
     exit(0);
 }

@@ -34,7 +34,7 @@ HASH_NODE* hashFind(char *text)
     return 0;
 }
 
-HASH_NODE* hashInsert(int type, char* text)
+HASH_NODE* hashInsert(char* text, int type)
 {
     HASH_NODE *newhashnode;
     int address = hashAddress(text);

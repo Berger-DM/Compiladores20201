@@ -1,4 +1,3 @@
-#include "ast.h"
 #include "hash.h"
 #include "y.tab.h"
 

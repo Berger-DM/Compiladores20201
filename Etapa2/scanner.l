@@ -1,74 +1,100 @@
 %{
-    //Autor: Nicolas Mauro de Moreira Bohnenberger - 00207160
-    #include "y.tab.h"
-    #include "hash.h"
-    int Running = 1;
-    int lineNumber = 1;
+#include "lex.yy.h"
+
+int is_running = TRUE;
+int line_number = 1;
+
+
+int isRunning(void) {
+    return is_running;
+}
+
+int getLineNumber(void) {
+    return line_number;
+}
+
 %}
 
 %x COMMENT
 
 %%
-"TRUE"                  	                        {hashInsert(SYMBOL_LIT_TRU, yytext); return LIT_TRUE;}
-"FALSE"                 	                        {hashInsert(SYMBOL_LIT_FLS, yytext); return LIT_FALSE;}
-"char"                  	                        return KW_CHAR;
-"int"                   	                        return KW_INT;
-"float"                 	                        return KW_FLOAT;
-"bool"                  	                        return KW_BOOL;
-"if"                    	                        return KW_IF;
-"then"                  	                        return KW_THEN;
-"else"                  	                        return KW_ELSE;
-"while"                 	                        return KW_WHILE;
-"loop"                  	                        return KW_LOOP;
-"read"                  	                        return KW_READ;
-"print"                 	                        return KW_PRINT;
-"return"                	                        return KW_RETURN;
-"<="                    	                        return OPERATOR_LE;
-">="                    	                        return OPERATOR_GE;
-"=="                    	                        return OPERATOR_EQ;
-"!="                    	                        return OPERATOR_DIF;
-[0-9][0-9A-F]*		 		                        {hashInsert(SYMBOL_LIT_INT, yytext); return LIT_INTEGER;}
-[0-9A-F]*\.[0-9A-F]+    	                        {hashInsert(SYMBOL_LIT_FLT, yytext); return LIT_FLOAT;}
 
-"\'"[a-zA-Z]"\'"        	                        {hashInsert(SYMBOL_LIT_CHR, yytext); return LIT_CHAR;}
-[a-zAz_@]+[0-9a-zA-z_@]*		                    {hashInsert(SYMBOL_TOK_IDT, yytext); return TK_IDENTIFIER;}
-"//".*			
-[ \t]			
-[\,\;\:\(\)\[\]\{\}\+\-\*\/\<\>\=\|\^\~\&\$\#]  	return yytext[0];
-"\n"                                            	++lineNumber;
-.			 				                        return TOKEN_ERROR;
+ /* Ignore white spaces and tabs */
+[ \t]
 
-\"([^\"\\\n]|\\.)*\"                      	 	    {hashInsert(SYMBOL_LIT_STR, yytext); return LIT_STRING;}
+ /* Detect new lines to increase line_number counter */
+"\n"        { ++line_number; }
 
-"/*"                                        	    BEGIN(COMMENT);
-<COMMENT>"\n"                               	    ++lineNumber;
-<COMMENT>"*/"                               	    BEGIN(INITIAL);
+ /* Type keywords */
+"char"      { return KW_CHAR; }
+"int"       { return KW_INT; }
+"float"     { return KW_FLOAT; }
+"bool"      { return KW_BOOL; }
+
+ /* Flow Control keywords */
+"if"        { return KW_IF; }
+"then"      { return KW_THEN; }
+"else"      { return KW_ELSE; }
+"while"     { return KW_WHILE; }
+"loop"      { return KW_LOOP; }
+"return"    { return KW_RETURN; }
+
+ /* IO keywords */
+"read"      { return KW_READ; }
+"print"     { return KW_PRINT; }
+
+ /* Operators */
+[\,\;\:\(\)\[\]\{\}\+\-\*\/\<\>\=\|\^\~\&\$\#]  { return yytext[0]; }
+
+ /* Composite Operators */
+"<="        { return OPERATOR_LE; }
+">="        { return OPERATOR_GE; }
+"=="        { return OPERATOR_EQ; }
+"!="        { return OPERATOR_DIF; }
+
+ /* Precedence for TRUE and FALSE constants instead of an identifier */
+"TRUE"                  { return LIT_TRUE; }
+"FALSE"                 { return LIT_FALSE; }
+
+ /* Identifiers */
+[a-zA-Z@_][0-9a-zA-Z@_]*    { hashInsert(yytext, TK_IDENTIFIER); return TK_IDENTIFIER; }
+
+ /* Integer and float literals (hexadecimal) */
+[A-F0-9]+               { hashInsert(yytext, LIT_INTEGER); return LIT_INTEGER; }
+[A-F0-9]*\.[A-F0-9]+    { hashInsert(yytext, LIT_FLOAT); return LIT_FLOAT; }
+
+ /* Chars and Strings */
+'(\\.|[^'\n\t])'        { hashInsert(yytext, LIT_CHAR); return LIT_CHAR; }
+\"([^"\\\n]|\\.)*\"     { hashInsert(yytext, LIT_STRING); return LIT_STRING; }
+
+ /* Comments */
+"//".*
+"/*"        { BEGIN(COMMENT); }
+
+ /* On Comment mode, ignore everything until
+    it reaches an end of comment token */
+<COMMENT>"*/"   { BEGIN(INITIAL); }
+<COMMENT>"\n"   { ++line_number; }
 <COMMENT>.
+
+.               { return TOKEN_ERROR; }
+
 %%
 
-// #include "y.tab.c"
 // #include "main.c"
-// #include "hash.c"
-
-void initMe(void)
-{
-    lineNumber = 1;
-    hashInit();
-}
-
-int getLineNumber(void)
-{
-    return lineNumber;
-}
-
-int isRunning(void)
-{
-    return Running;
-}
 
 int yywrap()
 {
-	Running = 0;
-	fprintf(stderr, "Line count: %d", lineNumber);
-	return 1;
+    is_running = FALSE;
+    return 1;
+}
+
+void initMe(void)
+{
+    // Initialize hash
+    hashInit();
+
+    // Initialize variables
+    is_running = TRUE;
+    line_number = 1;
 }

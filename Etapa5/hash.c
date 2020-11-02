@@ -1,4 +1,5 @@
 #include "hash.h"
+#include <string.h>
 
 HASH_NODE **table = NULL;
 
@@ -103,4 +104,20 @@ void hashPrint(void)
             for (node = table[tableIdx], list_idx = 0; node; node = node->next, list_idx++)
                 printf("Table[%d][%d] -> %s (Type %d)\n", tableIdx, list_idx, node->text, node->type);
     }
+}
+
+HASH_NODE* makeTemp(void)
+{
+    static int serial = 0;
+    char buffer[256] = "";
+    sprintf(buffer, "myWeirdT_e_m_p%d", serial++);
+    return hashInsert(buffer, SYMBOL_VARIABLE);
+}
+
+HASH_NODE* makeLabel(void)
+{
+    static int serial = 0;
+    char buffer[256] = "";
+    sprintf(buffer, "myWeirdL_a_b_e_l%d", serial++);
+    return hashInsert(buffer, SYMBOL_LABEL);
 }

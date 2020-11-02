@@ -1,10 +1,3 @@
-%{
-    #include <stdio.h>
-    #include <stdlib.h>
-    int getLineNumber(void);
-    int yylex();
-    int yyerror();
-%}
 
 %token KW_CHAR
 %token KW_INT
@@ -35,120 +28,137 @@
 
 %token TOKEN_ERROR
 
-%start program
-%right '='
-%left '^' '~' '|'
-%left '.' '&'
-%left OPERATOR_EQ OPERATOR_GE OPERATOR_LE OPERATOR_DIF '>' '<'
+ // Precedence rules
+%left '|' '^'
+%left '<' '>' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_DIF
 %left '+' '-'
 %left '*' '/'
-%right KW_IF KW_THEN KW_ELSE
+%left '~'
+
+
+
+%{
+// Declarations to get rid of warnings about not finding function when compiling
+// It will work just fine in the linking step of the compilation
+int yylex();
+int yyerror();
+%}
+
 %%
 
-program
-    : declaration
-    ;
-    
-declaration
-    : declares declaration
-    | declares
-    ;
-    
-declares
-    : var_global ';'
-    | function ';'
+ /* First rule, defining a program */
+programa: ldecl
     ;
 
-function
-    : TK_IDENTIFIER '(' parameter_list ')' '=' type command_block
-    ;
-    
-var_global
-    : TK_IDENTIFIER '=' type ':' literal
-    | TK_IDENTIFIER '=' type '[' LIT_INTEGER ']' ':' literal_list
-    | TK_IDENTIFIER '=' type '[' LIT_INTEGER ']'
-    ;
-    
-literal_list
-    : literal literal_list
-    | literal
-    | 
-    ;
-    
-literal
-    : LIT_TRUE
-    | LIT_FALSE
-    | LIT_INTEGER
-    | LIT_FLOAT
-    | LIT_CHAR
-    ;
-    
-parameter_list
-    : parameter ',' parameter_list
-    | parameter
-    | 
-    ;
-    
-parameter
-    : TK_IDENTIFIER '=' type
-    ;
-    
-type
-    : KW_BOOL
-    | KW_INT
-    | KW_FLOAT
-    | KW_CHAR
-    ;
-    
-command_sequence
-    : command command_sequence
+ /* Always finish a declaration with a `;`, and also accept an empty ldecl */
+ldecl: declv ';' ldecl
+    | declf ';' ldecl
     |
     ;
-    
-command
-    : TK_IDENTIFIER '=' expression
+
+ /* Helper rule to define both booleans */
+lit_bool: LIT_TRUE
+    | LIT_FALSE
+    ;
+
+ /* Helper rule with all type keywords */
+any_kw_type: KW_CHAR
+    | KW_INT
+    | KW_FLOAT
+    | KW_BOOL
+    ;
+
+/* Helper rule with all literals keywords, except string */
+any_lit: LIT_CHAR
+    | LIT_INTEGER
+    | LIT_FLOAT
+    | lit_bool
+    ;
+
+ /* Variable declaration */
+declv: declv_not_vector
+    | declv_vector
+    ;
+
+ /* Variable declaration when is not a vector */
+declv_not_vector: TK_IDENTIFIER '=' any_kw_type ':' any_lit
+    ;
+
+ /* Variable declaration when is not a vector */
+ /* We have the rule with initialization first, and without initialization later */
+declv_vector: TK_IDENTIFIER '=' any_kw_type '[' LIT_INTEGER ']' ':' lvector
+    | TK_IDENTIFIER '=' any_kw_type '[' LIT_INTEGER ']'
+    ;
+
+lvector: any_lit lvector
+    | any_lit
+    ;
+
+declf: function_header block
+    ;
+
+function_header: TK_IDENTIFIER function_params '=' any_kw_type
+    ;
+
+function_params: '(' lparam ')'
+    | '(' ')'
+    ;
+
+lparam: TK_IDENTIFIER '=' any_kw_type rest_params
+    ;
+
+rest_params: ',' lparam
+    |
+    ;
+
+block: '{' lcommand '}'
+    ;
+
+lcommand: command lcommand
+    | command
+    ;
+
+command: attrib
+    | flow_command
+    | read_command
+    | print_command
+    | return_command
+    | block
+    |
+    ;
+
+attrib: TK_IDENTIFIER '=' expression
     | TK_IDENTIFIER '[' expression ']' '=' expression
-    | KW_READ TK_IDENTIFIER
-    | KW_PRINT print_list
-    | KW_RETURN expression
-    | flow_control
-    | command_block
-    |  
     ;
-    
-command_block
-    : '{' command_sequence '}'
+
+read_command: KW_READ TK_IDENTIFIER
     ;
-    
-print_list
-    : print_element ',' print_list
-    | print_element
+
+print_command: KW_PRINT lprint
     ;
-    
-print_element
-    : LIT_STRING
+
+lprint: LIT_STRING ',' lprint
+    | LIT_STRING
+    | expression ',' lprint
     | expression
     ;
-    
-flow_control
-    : KW_IF '(' expression ')' KW_THEN command
+
+return_command: KW_RETURN expression
+    ;
+
+
+flow_command: KW_IF '(' expression ')' KW_THEN command
     | KW_IF '(' expression ')' KW_THEN command KW_ELSE command
     | KW_WHILE '(' expression ')' command
     | KW_LOOP '(' TK_IDENTIFIER ':' expression ',' expression ',' expression ')' command
     ;
-    
-expression
-    : TK_IDENTIFIER
+
+expression: TK_IDENTIFIER
     | TK_IDENTIFIER '[' expression ']'
-    | TK_IDENTIFIER '(' parameter_list ')'
-    | LIT_INTEGER
-    | LIT_FLOAT
-    | LIT_CHAR
+    | any_lit
     | '(' expression ')'
-    | expression OPERATOR_LE expression
-    | expression OPERATOR_GE expression
-    | expression OPERATOR_EQ expression
-    | expression OPERATOR_DIF expression
+    | '-' expression
+    | '~' expression
     | expression '+' expression
     | expression '-' expression
     | expression '*' expression
@@ -157,15 +167,36 @@ expression
     | expression '>' expression
     | expression '|' expression
     | expression '^' expression
-    | expression '~' expression
-    | expression '.' expression
-    | expression '&' expression
+    | expression OPERATOR_LE expression
+    | expression OPERATOR_GE expression
+    | expression OPERATOR_EQ expression
+    | expression OPERATOR_DIF expression
+    | func_call
     ;
+
+func_call: TK_IDENTIFIER '(' lparameter_func_call ')'
+    | TK_IDENTIFIER  '(' ')'
+    ;
+
+lparameter_func_call: expression rest_params_func_call
+    ;
+
+rest_params_func_call: ',' lparameter_func_call
+    |
+    ;
+
 
 %%
 
-int yyerror(char *msg)
+#include <stdio.h>
+#include <stdlib.h>
+
+// Referencing the function available at scanner.l
+extern int getLineNumber();
+
+int yyerror()
 {
-    fprintf(stderr, "Syntax error at line %d. \n", getLineNumber());
+    fprintf(stderr, "Syntax error at line %d\n", getLineNumber());
+
     exit(3);
 }

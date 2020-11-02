@@ -1,6 +1,7 @@
 %{
     #include "ast.h"
     #include "hash.h"
+    #include "tacs.h"
 
     // Helper to create a symbol AST
     #define SYMBOL_AST(x) AST_create(AST_SYMBOL, x, NULL, NULL, NULL, NULL, NULL)
@@ -95,12 +96,15 @@ int yyerror();
 
 %%
 
-programa: ldecl         { $$ = $1; ASTroot = $$; }
+programa: ldecl         { $$ = $1; 
+                        ASTroot = $$;
+                        tacPrintBackwards(codeGen($1));
+                        }
     ;
 
-ldecl: declvar ';' ldecl  { $$ = AST_create( AST_LDECL, NULL, $1, $3, NULL, NULL, NULL); }
-    | declfun ';' ldecl   { $$ = AST_create( AST_LDECL, NULL, $1, $3, NULL, NULL, NULL); }
-    |                   { $$ = NULL; }
+ldecl: declvar ';' ldecl    { $$ = AST_create( AST_LDECL, NULL, $1, $3, NULL, NULL, NULL); }
+    | declfun ';' ldecl     { $$ = AST_create( AST_LDECL, NULL, $1, $3, NULL, NULL, NULL); }
+    |                       { $$ = NULL; }
     ;
 
 lit_bool: LIT_TRUE      { $$ = SYMBOL_AST($1); }
@@ -119,15 +123,15 @@ any_lit: LIT_CHAR       { $$ = SYMBOL_AST($1); }
     | lit_bool          { $$ = $1; }
     ;
 
-declvar: declvar_not_vector { $$ = $1; }
-    | declvar_vector      { $$ = $1; }
+declvar: declvar_not_vector     { $$ = $1; }
+    | declvar_vector            { $$ = $1; }
     ;
 
 declvar_not_vector: TK_IDENTIFIER '=' any_kw_type ':' any_lit     { $$ = AST_create( AST_DECLVAR_NOT_VECTOR, NULL, SYMBOL_AST($1), $3, $5, NULL, NULL); }
     ;
 
-declvar_vector: TK_IDENTIFIER '=' any_kw_type '[' LIT_INTEGER ']' ':' lvector { $$ = AST_create( AST_DECLVAR_VECTOR, NULL, SYMBOL_AST($1), $3, SYMBOL_AST($5), $8, NULL); }
-    | TK_IDENTIFIER '=' any_kw_type '[' LIT_INTEGER ']'                     { $$ = AST_create( AST_DECLVAR_VECTOR, NULL, SYMBOL_AST($1), $3, SYMBOL_AST($5), NULL, NULL); }
+declvar_vector: TK_IDENTIFIER '=' any_kw_type '[' LIT_INTEGER ']' ':' lvector   { $$ = AST_create( AST_DECLVAR_VECTOR, NULL, SYMBOL_AST($1), $3, SYMBOL_AST($5), $8, NULL); }
+    | TK_IDENTIFIER '=' any_kw_type '[' LIT_INTEGER ']'                         { $$ = AST_create( AST_DECLVAR_VECTOR, NULL, SYMBOL_AST($1), $3, SYMBOL_AST($5), NULL, NULL); }
     ;
 
 lvector: any_lit lvector            { $$ = AST_create( AST_LVECTOR, NULL, $1, $2, NULL, NULL, NULL); }
@@ -140,7 +144,7 @@ declfun: fun_header comm_block        { $$ = AST_create( AST_FUN, NULL, $1, $2, 
 fun_header: TK_IDENTIFIER fun_params '=' any_kw_type  { $$ = AST_create( AST_FUN_HEADER, NULL, SYMBOL_AST($1), $2, $4, NULL, NULL); }
     ;
 
-fun_params: '(' lparam ')'     { $$ = $2; }
+fun_params: '(' lparam ')'          { $$ = $2; }
     | '(' ')'                       { $$ = NULL; }
     ;
 
@@ -151,7 +155,7 @@ rest_params: ',' lparam                             { $$ = $2; }
     |                                               { $$ = NULL; }
     ;
 
-comm_block: '{' comm_seq '}'                             { $$ = $2; }
+comm_block: '{' comm_seq '}'                        { $$ = $2; }
     ;
 
 comm_seq: command comm_seq                          { $$ = AST_create( AST_COMM_SEQ, NULL, $1, $2, NULL, NULL, NULL); }
@@ -163,7 +167,7 @@ command: attrib                                     { $$ = $1; }
     | read_command                                  { $$ = $1; }
     | print_command                                 { $$ = $1; }
     | return_command                                { $$ = $1; }
-    | comm_block                                         { $$ = $1; }
+    | comm_block                                    { $$ = $1; }
     |                                               { $$ = NULL; }
     ;
 
@@ -210,18 +214,18 @@ expression: TK_IDENTIFIER                       { $$ = SYMBOL_AST($1); }
     | expression OPERATOR_GE expression         { $$ = AST_create(AST_GE, NULL, $1, $3, NULL, NULL, NULL); }
     | expression OPERATOR_EQ expression         { $$ = AST_create(AST_EQ, NULL, $1, $3, NULL, NULL, NULL); }
     | expression OPERATOR_DIF expression        { $$ = AST_create(AST_DIF, NULL, $1, $3, NULL, NULL, NULL); }
-    | fun_call                                 { $$ = $1; }
+    | fun_call                                  { $$ = $1; }
     ;
 
-fun_call: TK_IDENTIFIER '(' lparam_fun_call ')'   { $$ = AST_create(AST_FUN_CALL, NULL, SYMBOL_AST($1), $3, NULL, NULL, NULL); }
-    | TK_IDENTIFIER  '(' ')'                            { $$ = AST_create(AST_FUN_CALL, NULL, SYMBOL_AST($1), NULL, NULL, NULL, NULL); }
+fun_call: TK_IDENTIFIER '(' lparam_fun_call ')'     { $$ = AST_create(AST_FUN_CALL, NULL, SYMBOL_AST($1), $3, NULL, NULL, NULL); }
+    | TK_IDENTIFIER  '(' ')'                        { $$ = AST_create(AST_FUN_CALL, NULL, SYMBOL_AST($1), NULL, NULL, NULL, NULL); }
     ;
 
-lparam_fun_call: expression rest_params_fun_call              { $$ = AST_create(AST_LPARAM, NULL, $1, $2, NULL, NULL, NULL); }
+lparam_fun_call: expression rest_params_fun_call    { $$ = AST_create(AST_LPARAM, NULL, $1, $2, NULL, NULL, NULL); }
     ;
 
-rest_params_fun_call: ',' lparam_fun_call                     { $$ = $2; }
-    |                                                               { $$ = NULL; }
+rest_params_fun_call: ',' lparam_fun_call           { $$ = $2; }
+    |                                               { $$ = NULL; }
     ;
 
 

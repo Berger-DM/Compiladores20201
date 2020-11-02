@@ -38,6 +38,7 @@ void main(const int argc, const char **argv)
     }
 
     yyparse();
+    //hashPrint();
     decompile(ASTroot, outfile);
     fprintf(stdout, "Succesful Compilation!\n");
 
